@@ -3,6 +3,7 @@ import millify from "millify";
 import { Link } from "react-router-dom";
 import { Card, Row, Col, Input } from "antd";
 import { useGetCryptosQuery } from "../services/cryptoApi";
+import { useDebounce } from "../hooks/useDebounce";
 
 const Cryptocurrencies = ({ simplified = false }) => {
   const count = simplified ? 10 : 100;
@@ -10,14 +11,16 @@ const Cryptocurrencies = ({ simplified = false }) => {
   const [cryptos, setCryptos] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
 
+  const term = useDebounce(searchTerm, 400);
+
   useEffect(() => {
     setCryptos(cryptosList?.data?.coins);
 
     const filteredData = cryptosList?.data?.coins.filter((coin) =>
-      coin.name.toLowerCase().includes(searchTerm.toLowerCase())
+      coin.name.toLowerCase().includes(term.toLowerCase())
     );
     setCryptos(filteredData);
-  }, [cryptosList?.data?.coins, searchTerm]);
+  }, [cryptosList?.data?.coins, term]);
 
   if (isFetching) return "Loading..";
 
