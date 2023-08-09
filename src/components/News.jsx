@@ -4,6 +4,7 @@ import moment from "moment/moment";
 import { Link } from "react-router-dom";
 import { useGetCryptoNewsQuery } from "../services/cryptoNewsApi";
 import { useGetCryptosQuery } from "../services/cryptoApi";
+import Loader from "./Loader";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -21,7 +22,7 @@ const News = ({ simplified = false }) => {
   });
   const ref = useRef("noreferrer");
 
-  if (isFetching) return "Loading..";
+  if (isFetching) return <Loader />;
 
   return (
     <Row gutter={[24, 24]}>
