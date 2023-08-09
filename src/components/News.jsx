@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Select, Typography, Row, Col, Avatar, Card } from "antd";
 import moment from "moment/moment";
 import { Link } from "react-router-dom";
 import { useGetCryptoNewsQuery } from "../services/cryptoNewsApi";
+import { useGetCryptosQuery } from "../services/cryptoApi";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -12,15 +13,15 @@ const defaultImage =
 
 const News = ({ simplified = false }) => {
   const count = simplified ? 6 : 12;
+  const [newsCategory, setNewsCategory] = useState("Cryptocurrency");
+  const { data } = useGetCryptosQuery(100);
   const { data: cryptoNews, isFetching } = useGetCryptoNewsQuery({
-    newsCategory: "Cryptocurrency",
+    newsCategory,
     count,
   });
   const ref = useRef("noreferrer");
 
   if (isFetching) return "Loading..";
-
-  console.log(cryptoNews);
 
   return (
     <Row gutter={[24, 24]}>
@@ -31,11 +32,18 @@ const News = ({ simplified = false }) => {
             className="select-news"
             placeholder="Select a Crypto"
             optionFilterProp="children"
-            onChange={(value) => console.log(value)}
+            onChange={(value) => setNewsCategory(value)}
             filterOption={(input, option) =>
               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
             }
-          ></Select>
+          >
+            <Option value="Cryptocurrency">Cryptocurrency</Option>
+            {data?.data?.coins.map((item) => (
+              <Option key={item.uuid} value={item.name}>
+                {item.name}
+              </Option>
+            ))}
+          </Select>
         </Col>
       )}
       {cryptoNews?.value?.map((item, index) => (
