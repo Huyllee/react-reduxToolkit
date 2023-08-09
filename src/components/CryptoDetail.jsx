@@ -14,8 +14,12 @@ import {
   NumberOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
-import { useGetCryptoDetailsQuery } from "../services/cryptoApi";
+import {
+  useGetCryptoDetailsQuery,
+  useGetCryptoHistoryQuery,
+} from "../services/cryptoApi";
 import Loader from "./Loader";
+import LineChart from "./LineChart";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -24,14 +28,16 @@ const CryptoDetail = () => {
   const { coinId } = useParams();
   const [timePeriod, setTimePeriod] = useState("7d");
   const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
+  const { data: coinHistory } = useGetCryptoHistoryQuery({
+    coinId,
+    timePeriod,
+  });
   const [cryptoDetails, setCryptoDetails] = useState({});
   const ref = useRef("noreferrer");
 
   useEffect(() => {
     setCryptoDetails(data?.data?.coin);
   }, [data?.data?.coin]);
-
-  console.log(data);
 
   const time = ["3h", "24h", "7d", "30d", "1y", "3m", "3y", "5y"];
 
@@ -124,6 +130,12 @@ const CryptoDetail = () => {
           <Option key={`${index}-${date}`}>{date}</Option>
         ))}
       </Select>
+
+      <LineChart
+        coinHistory={coinHistory}
+        coinName={cryptoDetails?.name}
+        currentPrice={millify(cryptoDetails?.price)}
+      />
 
       <Col className="stats-container">
         <Col className="coin-value-statistics">
